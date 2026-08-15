@@ -45,6 +45,14 @@ Both shapes below use identical dimensions and the same `48px` radius value. Sta
   />
 </p>
 
+## Limitations
+
+Border Bézier uses `clip-path`, so content outside the element — including
+external `box-shadow` — may be clipped. Inline CSS custom property changes
+require calling `refresh()` manually.
+
+Designed for modern browsers with support for `ResizeObserver`,
+`Path2D`, and `clip-path: path()`.
 
 ## Quick start
 
