@@ -33,6 +33,10 @@ border-bezier/
 - `border-bezier.module.js` provides ES module exports for bundlers and servers.
 - `demo/index.html` is a minimal demo that can be opened directly.
 
+## Live demo
+
+Open the [live demo](https://lihnnh.github.io/border-bezier/)
+
 ## Border Bézier vs. border-radius
 
 Both shapes below use identical dimensions and the same `48px` radius value. Standard `border-radius` follows a circular corner, while Border Bézier extends the transition into the edges for a smoother, more continuous curve.
