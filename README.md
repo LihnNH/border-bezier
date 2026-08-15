@@ -6,6 +6,8 @@ Bézier corners beyond standard `border-radius`.
 It is declarative, responsive, customizable through CSS custom properties,
 and also exposes a JavaScript API for programmatic control.
 
+![Border Bézier preview](./assets/border-bezier-preview.png)
+
 ## Files
 
 ```text
