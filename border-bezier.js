@@ -56,65 +56,57 @@
   }) {
     const r = clamp(radius, 0, Math.min(width, height) / 2);
     const s = clamp(smoothing, 0, 1);
+    const circleHandle = 0.552284749831;
+    const continuousHandle = 0.775;
+    const handle = mix(circleHandle, continuousHandle, s);
+    const inverseHandle = 1 - handle;
 
     /*
-     * Normalized quarter-corner profile.
-     * s = 0 approaches a circular corner.
-     * s = 1 produces the extended, continuous transition.
+     * Each corner is one cubic Bézier instead of two stitched curves.
+     *
+     * At smoothing = 0, the handles approximate a circular quarter arc.
+     * At smoothing = 1, the longer handles preserve the original extended
+     * corner profile. Using one cubic removes the internal seam without
+     * changing the visual identity of the curve.
      */
-    const profile = [
-      [0, 0],
-      [mix(0.265216, 0.5, s), 0],
-      [mix(0.51957, 0.72, s), mix(0.10536, 0.108, s)],
-      [mix(0.707107, 0.892, s), mix(0.292893, 0.36, s)],
-      [mix(0.89464, 0.96, s), mix(0.48043, 0.52, s)],
-      [1, mix(0.734784, 0.76, s)],
-      [1, 1]
-    ];
+    const topRight = [
+      "C",
+      round(width - r + handle * r), 0,
+      round(width), round(inverseHandle * r),
+      round(width), round(r)
+    ].join(" ");
 
-    const transform = (point, corner) => {
-      const [u, v] = point;
+    const bottomRight = [
+      "C",
+      round(width), round(height - r + handle * r),
+      round(width - r + handle * r), round(height),
+      round(width - r), round(height)
+    ].join(" ");
 
-      switch (corner) {
-        case "top-right":
-          return [width - r + u * r, v * r];
-        case "bottom-right":
-          return [width - r + u * r, height - v * r];
-        case "bottom-left":
-          return [r - u * r, height - v * r];
-        default:
-          return [r - u * r, v * r];
-      }
-    };
+    const bottomLeft = [
+      "C",
+      round(r - handle * r), round(height),
+      0, round(height - r + handle * r),
+      0, round(height - r)
+    ].join(" ");
 
-    const curve = corner => {
-      const reverse = corner === "bottom-right" || corner === "top-left";
-      const cornerProfile = reverse ? [...profile].reverse() : profile;
-      const points = cornerProfile
-        .slice(1)
-        .map(point => transform(point, corner))
-        .map(([x, y]) => [round(x), round(y)]);
-
-      return [
-        "C", points[0][0], points[0][1],
-        points[1][0], points[1][1],
-        points[2][0], points[2][1],
-        "C", points[3][0], points[3][1],
-        points[4][0], points[4][1],
-        points[5][0], points[5][1]
-      ].join(" ");
-    };
+    const topLeft = [
+      "C",
+      0, round(r - handle * r),
+      round(r - handle * r), 0,
+      round(r), 0
+    ].join(" ");
 
     return [
       "M", round(r), 0,
       "H", round(width - r),
-      curve("top-right"),
+      topRight,
       "V", round(height - r),
-      curve("bottom-right"),
+      bottomRight,
       "H", round(r),
-      curve("bottom-left"),
+      bottomLeft,
       "V", round(r),
-      curve("top-left"),
+      topLeft,
       "Z"
     ].join(" ");
   }
