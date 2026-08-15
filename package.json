@@ -1,0 +1,27 @@
+{
+  "name": "border-bezier",
+  "version": "0.1.0",
+  "description": "Smooth, continuous Bézier corners beyond standard border-radius.",
+  "type": "module",
+  "main": "./border-bezier.module.js",
+  "module": "./border-bezier.module.js",
+  "exports": {
+    ".": "./border-bezier.module.js",
+    "./css": "./border-bezier.css",
+    "./global": "./border-bezier.js"
+  },
+  "files": [
+    "border-bezier.css",
+    "border-bezier.js",
+    "border-bezier.module.js"
+  ],
+  "keywords": [
+    "bezier",
+    "border-radius",
+    "continuous-corners",
+    "css",
+    "clip-path"
+  ],
+  "author": "Raul Hass",
+  "license": "MIT"
+}
