@@ -6,7 +6,13 @@ Bézier corners beyond standard `border-radius`.
 It is declarative, responsive, customizable through CSS custom properties,
 and also exposes a JavaScript API for programmatic control.
 
-![Border Bézier preview](./assets/border-bezier-preview.png)
+<p align="center">
+  <img
+    src="./assets/border-bezier-preview.png"
+    alt="Border Bézier preview"
+    width="720"
+  />
+</p>
 
 ## Files
 
@@ -26,6 +32,19 @@ border-bezier/
 - `border-bezier.js` is the classic browser build and works through `file://`.
 - `border-bezier.module.js` provides ES module exports for bundlers and servers.
 - `demo/index.html` is a minimal demo that can be opened directly.
+
+## Border Bézier vs. border-radius
+
+Both shapes below use identical dimensions and the same `48px` radius value. Standard `border-radius` follows a circular corner, while Border Bézier extends the transition into the edges for a smoother, more continuous curve.
+
+<p align="center">
+  <img
+    src="./assets/border-bezier-comparison.png"
+    alt="Visual comparison between CSS border-radius and Border Bézier"
+    width="100%"
+  />
+</p>
+
 
 ## Quick start
 
