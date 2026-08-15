@@ -35,7 +35,9 @@ border-bezier/
 
 ## Live demo
 
-Open the [live demo](https://lihnnh.github.io/border-bezier/)
+<a href="https://lihnnh.github.io/border-bezier/" target="_blank" rel="noopener noreferrer">
+  Open the live demo here
+</a>
 
 ## Border Bézier vs. border-radius
 
