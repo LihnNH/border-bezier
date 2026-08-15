@@ -1,0 +1,730 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Interactive playground for smooth, continuous border-bezier corners."
+    />
+    <meta name="theme-color" content="#f4f3ef" />
+    <title>border-bezier playground</title>
+
+    <link rel="stylesheet" href="./border-bezier.css" />
+    <script defer src="./border-bezier.js"></script>
+
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #151515;
+        --muted: #66655f;
+        --paper: #f4f3ef;
+        --panel: #fff;
+        --line: #dcd9d1;
+        --grid: #e7e5de;
+        --accent: #7357ff;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        min-width: 320px;
+        min-height: 100vh;
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font-family:
+          Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      button,
+      input {
+        font: inherit;
+      }
+
+      button {
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .page {
+        width: min(1180px, calc(100% - 40px));
+        margin-inline: auto;
+        padding-block: clamp(28px, 5vh, 52px);
+      }
+
+      .heading {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
+        gap: 40px;
+        align-items: center;
+        margin-bottom: 28px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(45px, 5vw, 60px);
+        font-weight: 780;
+        letter-spacing: -0.065em;
+        line-height: 0.95;
+      }
+
+      .heading p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.55;
+      }
+
+      .playground {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 330px;
+        min-height: 620px;
+        overflow: hidden;
+        border: 1px solid var(--line);
+        border-radius: 30px;
+        background: var(--panel);
+        box-shadow: 0 24px 70px rgb(24 23 20 / 8%);
+      }
+
+      .stage-wrap {
+        position: relative;
+        display: grid;
+        min-width: 0;
+        min-height: 570px;
+        place-items: center;
+        overflow: hidden;
+        padding: 52px;
+        background:
+          linear-gradient(var(--grid) 1px, transparent 1px),
+          linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+          #f2f1ec;
+        background-size: 24px 24px;
+      }
+
+      .stage-toolbar {
+        position: absolute;
+        top: 18px;
+        left: 18px;
+        z-index: 3;
+        display: flex;
+        gap: 5px;
+        padding: 5px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: rgb(255 255 255 / 88%);
+        box-shadow: 0 8px 24px rgb(23 23 20 / 8%);
+        backdrop-filter: blur(12px);
+      }
+
+      .mode-button,
+      .preset,
+      .reset-button,
+      .copy-button {
+        border: 0;
+        cursor: pointer;
+      }
+
+      .mode-button {
+        min-height: 32px;
+        padding: 0 12px;
+        border-radius: 999px;
+        background: transparent;
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 740;
+      }
+
+      .mode-button[aria-pressed="true"] {
+        background: var(--ink);
+        color: #fff;
+      }
+
+      .stage {
+        position: relative;
+        width: 100%;
+        min-height: 340px;
+        display: grid;
+        place-items: center;
+      }
+
+      .shape {
+        --border-bezier: 90px;
+        --border-bezier-smoothing: 1;
+
+        position: absolute;
+        width: 480px;
+        max-width: 100%;
+        height: 180px;
+        display: grid;
+        place-items: center;
+        background: var(--ink);
+        color: #fff;
+        box-shadow: 0 30px 60px rgb(20 20 20 / 17%);
+        transition:
+          width 220ms cubic-bezier(0.2, 0.75, 0.2, 1),
+          height 220ms cubic-bezier(0.2, 0.75, 0.2, 1);
+      }
+
+      .shape span {
+        position: relative;
+        z-index: 2;
+        padding: 14px 18px;
+        font-size: clamp(15px, 2vw, 19px);
+        font-weight: 760;
+        letter-spacing: -0.04em;
+        text-align: center;
+      }
+
+      .shape-radius {
+        z-index: 2;
+        display: none;
+        border: 2px dashed rgb(115 87 255 / 82%);
+        background: transparent;
+        box-shadow: none;
+        color: var(--accent);
+        pointer-events: none;
+      }
+
+      .stage[data-mode="compare"] .shape-radius {
+        display: grid;
+        transform: translate(16px, 16px);
+      }
+
+      .stage[data-mode="compare"] .shape-bezier {
+        transform: translate(-16px, -16px);
+      }
+
+      .stage-caption {
+        position: absolute;
+        right: 18px;
+        bottom: 16px;
+        color: #77766f;
+        font-family: "SFMono-Regular", Consolas, monospace;
+        font-size: 10px;
+      }
+
+      .controls {
+        display: flex;
+        flex-direction: column;
+        border-left: 1px solid var(--line);
+        background: #fbfaf7;
+      }
+
+      .controls-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 73px;
+        padding: 0 22px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .controls-header strong {
+        font-size: 13px;
+        letter-spacing: -0.02em;
+      }
+
+      .reset-button {
+        min-height: 31px;
+        padding: 0 10px;
+        border-radius: 8px;
+        background: transparent;
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      .reset-button:hover {
+        background: #eeece5;
+        color: var(--ink);
+      }
+
+      .control-list {
+        display: grid;
+        gap: 24px;
+        padding: 25px 22px 20px;
+      }
+
+      .control {
+        display: grid;
+        gap: 11px;
+      }
+
+      .control-heading {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 16px;
+      }
+
+      .control label {
+        color: #3e3e3a;
+        font-size: 12px;
+        font-weight: 680;
+      }
+
+      .value {
+        min-width: 50px;
+        color: var(--muted);
+        font-family: "SFMono-Regular", Consolas, monospace;
+        font-size: 11px;
+        text-align: right;
+      }
+
+      input[type="range"] {
+        --progress: 50%;
+
+        width: 100%;
+        height: 4px;
+        margin: 5px 0;
+        border-radius: 999px;
+        outline: 0;
+        appearance: none;
+        background:
+          linear-gradient(var(--accent), var(--accent)) 0 / var(--progress) 100% no-repeat,
+          #dcd9d0;
+        cursor: pointer;
+      }
+
+      input[type="range"]::-webkit-slider-thumb {
+        width: 17px;
+        height: 17px;
+        border: 4px solid #fff;
+        border-radius: 50%;
+        appearance: none;
+        background: var(--accent);
+        box-shadow: 0 1px 7px rgb(30 20 80 / 25%);
+      }
+
+      input[type="range"]::-moz-range-thumb {
+        width: 10px;
+        height: 10px;
+        border: 4px solid #fff;
+        border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 1px 7px rgb(30 20 80 / 25%);
+      }
+
+      input[type="range"]:focus-visible::-webkit-slider-thumb {
+        box-shadow: 0 0 0 3px #e8e2ff;
+      }
+
+      .presets {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 7px;
+        padding: 0 22px 22px;
+      }
+
+      .preset {
+        min-height: 35px;
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        background: #fff;
+        color: var(--muted);
+        font-size: 10px;
+        font-weight: 720;
+      }
+
+      .preset:hover {
+        border-color: #bfbcb3;
+        color: var(--ink);
+      }
+
+      .code-panel {
+        margin-top: auto;
+        border-top: 1px solid var(--line);
+        background: var(--ink);
+        color: #f4f3ef;
+      }
+
+      .code-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 46px;
+        padding: 0 16px 0 19px;
+        border-bottom: 1px solid #30302e;
+      }
+
+      .code-header span {
+        color: #aaa99f;
+        font-size: 10px;
+        font-weight: 720;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .copy-button {
+        min-height: 28px;
+        padding: 0 10px;
+        border-radius: 7px;
+        background: #292927;
+        color: #dddcd5;
+        font-size: 10px;
+        font-weight: 720;
+      }
+
+      .copy-button:hover {
+        background: #393936;
+        color: #fff;
+      }
+
+      pre {
+        min-height: 122px;
+        margin: 0;
+        overflow: auto;
+        padding: 17px 19px 21px;
+        color: #d7d6cf;
+        font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+        font-size: 11px;
+        line-height: 1.65;
+        tab-size: 2;
+      }
+
+      .token-property {
+        color: #a897ff;
+      }
+
+      .token-number {
+        color: #a9d5b0;
+      }
+
+      @media (max-width: 900px) {
+        .heading {
+          grid-template-columns: 1fr;
+          gap: 16px;
+        }
+
+        .heading p {
+          max-width: 520px;
+        }
+
+        .playground {
+          grid-template-columns: 1fr;
+        }
+
+        .controls {
+          border-top: 1px solid var(--line);
+          border-left: 0;
+        }
+
+        .control-list {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .code-panel {
+          margin-top: 0;
+        }
+      }
+
+      @media (max-width: 620px) {
+        .page {
+          width: calc(100% - 24px);
+          padding-block: 26px;
+        }
+
+        h1 {
+          font-size: 46px;
+        }
+
+        .playground {
+          border-radius: 22px;
+        }
+
+        .stage-wrap {
+          min-height: 430px;
+          padding: 40px 22px;
+        }
+
+        .stage {
+          min-height: 300px;
+        }
+
+        .shape {
+          max-width: calc(100vw - 70px);
+        }
+
+        .control-list {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          transition-duration: 0.01ms !important;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <main class="page">
+      <header class="heading">
+        <h1>Shape it live.</h1>
+        <p>
+          Change the dimensions and curve profile. The generated CSS stays
+          ready to copy into your own project.
+        </p>
+      </header>
+
+      <section class="playground" aria-label="Interactive border-bezier playground">
+        <div class="stage-wrap">
+          <div class="stage-toolbar" role="group" aria-label="Preview mode">
+            <button
+              class="mode-button"
+              type="button"
+              data-mode="bezier"
+              aria-pressed="true"
+            >
+              Bézier
+            </button>
+            <button
+              class="mode-button"
+              type="button"
+              data-mode="compare"
+              aria-pressed="false"
+            >
+              Compare
+            </button>
+          </div>
+
+          <div class="stage" data-mode="bezier">
+            <div class="shape shape-radius" aria-hidden="true">
+              <span>border-radius</span>
+            </div>
+            <div class="shape shape-bezier" data-border-bezier>
+              <span>border-bezier</span>
+            </div>
+          </div>
+
+          <span class="stage-caption">live preview · actual path</span>
+        </div>
+
+        <aside class="controls" aria-label="Border Bézier controls">
+          <div class="controls-header">
+            <strong>Properties</strong>
+            <button class="reset-button" id="reset" type="button">Reset</button>
+          </div>
+
+          <div class="control-list">
+            <div class="control">
+              <div class="control-heading">
+                <label for="radius">Radius</label>
+                <output class="value" id="radius-value" for="radius">90px</output>
+              </div>
+              <input id="radius" type="range" min="0" max="140" value="90" />
+            </div>
+
+            <div class="control">
+              <div class="control-heading">
+                <label for="smoothing">Smoothing</label>
+                <output class="value" id="smoothing-value" for="smoothing">1.00</output>
+              </div>
+              <input
+                id="smoothing"
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value="1"
+              />
+            </div>
+
+            <div class="control">
+              <div class="control-heading">
+                <label for="width">Width</label>
+                <output class="value" id="width-value" for="width">480px</output>
+              </div>
+              <input id="width" type="range" min="220" max="620" value="480" />
+            </div>
+
+            <div class="control">
+              <div class="control-heading">
+                <label for="height">Height</label>
+                <output class="value" id="height-value" for="height">180px</output>
+              </div>
+              <input id="height" type="range" min="90" max="300" value="180" />
+            </div>
+          </div>
+
+          <div class="presets" aria-label="Presets">
+            <button class="preset" type="button" data-preset="pill">Pill</button>
+            <button class="preset" type="button" data-preset="card">Card</button>
+            <button class="preset" type="button" data-preset="soft">Soft</button>
+          </div>
+
+          <div class="code-panel">
+            <div class="code-header">
+              <span>CSS</span>
+              <button class="copy-button" id="copy-css" type="button">Copy CSS</button>
+            </div>
+            <pre aria-live="polite"><code id="live-code"></code></pre>
+          </div>
+        </aside>
+      </section>
+    </main>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const defaults = {
+          radius: 90,
+          smoothing: 1,
+          width: 480,
+          height: 180
+        };
+
+        const presets = {
+          pill: { radius: 90, smoothing: 1, width: 480, height: 180 },
+          card: { radius: 42, smoothing: 0.88, width: 420, height: 260 },
+          soft: { radius: 66, smoothing: 0.62, width: 520, height: 210 }
+        };
+
+        const controls = {
+          radius: document.querySelector("#radius"),
+          smoothing: document.querySelector("#smoothing"),
+          width: document.querySelector("#width"),
+          height: document.querySelector("#height")
+        };
+
+        const outputs = {
+          radius: document.querySelector("#radius-value"),
+          smoothing: document.querySelector("#smoothing-value"),
+          width: document.querySelector("#width-value"),
+          height: document.querySelector("#height-value")
+        };
+
+        const stage = document.querySelector(".stage");
+        const bezierShape = document.querySelector(".shape-bezier");
+        const radiusShape = document.querySelector(".shape-radius");
+        const liveCode = document.querySelector("#live-code");
+        const instance = window.BorderBezier.mountBorderBezier(bezierShape);
+
+        function currentValues() {
+          return {
+            radius: Number(controls.radius.value),
+            smoothing: Number(controls.smoothing.value),
+            width: Number(controls.width.value),
+            height: Number(controls.height.value)
+          };
+        }
+
+        function updateRangeProgress(input) {
+          const min = Number(input.min) || 0;
+          const max = Number(input.max) || 100;
+          const progress = ((Number(input.value) - min) / (max - min)) * 100;
+          input.style.setProperty("--progress", `${progress}%`);
+        }
+
+        function updateCode({ radius, smoothing }) {
+          liveCode.innerHTML = [
+            ".my-element {",
+            `  <span class="token-property">--border-bezier</span>: <span class="token-number">${radius}px</span>;`,
+            `  <span class="token-property">--border-bezier-smoothing</span>: <span class="token-number">${smoothing.toFixed(2)}</span>;`,
+            "}"
+          ].join("\n");
+        }
+
+        function render() {
+          const state = currentValues();
+
+          outputs.radius.value = `${state.radius}px`;
+          outputs.smoothing.value = state.smoothing.toFixed(2);
+          outputs.width.value = `${state.width}px`;
+          outputs.height.value = `${state.height}px`;
+
+          bezierShape.style.width = `${state.width}px`;
+          bezierShape.style.height = `${state.height}px`;
+          bezierShape.style.setProperty("--border-bezier", `${state.radius}px`);
+          bezierShape.style.setProperty(
+            "--border-bezier-smoothing",
+            state.smoothing
+          );
+
+          radiusShape.style.width = `${state.width}px`;
+          radiusShape.style.height = `${state.height}px`;
+          radiusShape.style.borderRadius = `${state.radius}px`;
+
+          Object.values(controls).forEach(updateRangeProgress);
+          updateCode(state);
+          requestAnimationFrame(() => instance.refresh());
+        }
+
+        function applyState(state) {
+          Object.entries(state).forEach(([property, value]) => {
+            controls[property].value = value;
+          });
+          render();
+        }
+
+        Object.values(controls).forEach(control => {
+          control.addEventListener("input", render);
+        });
+
+        document.querySelectorAll("[data-preset]").forEach(button => {
+          button.addEventListener("click", () => {
+            applyState(presets[button.dataset.preset]);
+          });
+        });
+
+        document.querySelector("#reset").addEventListener("click", () => {
+          applyState(defaults);
+        });
+
+        document.querySelectorAll("[data-mode]").forEach(button => {
+          button.addEventListener("click", () => {
+            const mode = button.dataset.mode;
+            stage.dataset.mode = mode;
+
+            document.querySelectorAll("[data-mode]").forEach(option => {
+              option.setAttribute(
+                "aria-pressed",
+                String(option.dataset.mode === mode)
+              );
+            });
+          });
+        });
+
+        async function copyText(text, button) {
+          try {
+            await navigator.clipboard.writeText(text);
+          } catch {
+            const area = document.createElement("textarea");
+            area.value = text;
+            area.style.position = "fixed";
+            area.style.opacity = "0";
+            document.body.append(area);
+            area.select();
+            document.execCommand("copy");
+            area.remove();
+          }
+
+          button.textContent = "Copied!";
+          window.setTimeout(() => {
+            button.textContent = "Copy CSS";
+          }, 1400);
+        }
+
+        document.querySelector("#copy-css").addEventListener("click", event => {
+          const state = currentValues();
+          const css = [
+            ".my-element {",
+            `  --border-bezier: ${state.radius}px;`,
+            `  --border-bezier-smoothing: ${state.smoothing.toFixed(2)};`,
+            "}"
+          ].join("\n");
+
+          copyText(css, event.currentTarget);
+        });
+
+        render();
+      });
+    </script>
+  </body>
+</html>
