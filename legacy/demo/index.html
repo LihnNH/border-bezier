@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Border Bézier — Legacy demo</title>
+
+    <link rel="stylesheet" href="../border-bezier.css" />
+    <script defer src="../border-bezier.js"></script>
+
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        margin: 0;
+        background: #fff;
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+      }
+      .pill {
+        --border-bezier: 50%;
+        --border-bezier-smoothing: 1;
+        width: min(320px, calc(100vw - 48px));
+        min-height: 88px;
+        display: grid;
+        place-items: center;
+        padding: 24px 40px;
+        background: #171717;
+        color: #fff;
+        font-size: 18px;
+        font-weight: 650;
+        letter-spacing: -0.02em;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="pill" data-border-bezier>border-bezier legacy</div>
+  </body>
+</html>

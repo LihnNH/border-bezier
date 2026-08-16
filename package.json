@@ -1,27 +1,65 @@
 {
   "name": "border-bezier",
-  "version": "0.1.0",
-  "description": "Smooth, continuous Bézier corners beyond standard border-radius.",
+  "version": "0.2.0",
+  "description": "Tiny, dependency-free continuous Bézier corners for CSS and JavaScript.",
   "type": "module",
-  "main": "./border-bezier.module.js",
-  "module": "./border-bezier.module.js",
+  "main": "./dist/border-bezier.module.js",
+  "module": "./dist/border-bezier.module.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    ".": "./border-bezier.module.js",
-    "./css": "./border-bezier.css",
-    "./global": "./border-bezier.js"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/border-bezier.module.js",
+      "default": "./dist/border-bezier.module.js"
+    },
+    "./css": "./dist/border-bezier.css",
+    "./global": "./dist/border-bezier.js",
+    "./package.json": "./package.json"
   },
   "files": [
-    "border-bezier.css",
-    "border-bezier.js",
-    "border-bezier.module.js"
+    "dist",
+    "LICENSE",
+    "README.md"
   ],
+  "sideEffects": [
+    "./dist/border-bezier.css",
+    "./dist/border-bezier.min.css",
+    "./dist/border-bezier.js",
+    "./dist/border-bezier.min.js"
+  ],
+  "scripts": {
+    "build": "node ./scripts/build.mjs && node ./scripts/sync-compat.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "check:package": "npm run build && node ./scripts/check-package.mjs",
+    "prepublishOnly": "npm run test && npm run check:package"
+  },
   "keywords": [
     "bezier",
     "border-radius",
     "continuous-corners",
     "css",
-    "clip-path"
+    "clip-path",
+    "smooth-corners",
+    "javascript",
+    "typescript"
   ],
   "author": "Raul Hass",
-  "license": "MIT"
+  "license": "MIT",
+  "homepage": "https://lihnnh.github.io/border-bezier/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LihnNH/border-bezier.git"
+  },
+  "bugs": {
+    "url": "https://github.com/LihnNH/border-bezier/issues"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.9",
+    "jsdom": "^26.1.0",
+    "vitest": "^3.2.4"
+  }
 }

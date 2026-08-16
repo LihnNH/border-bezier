@@ -1,18 +1,6 @@
 /**
- * border-bezier.module.js
- * ES module adapter for border-bezier.js.
+ * Backward-compatible direct-file entry point for the Modern ESM source.
  */
 
-import "./border-bezier.js";
-
-const api = globalThis.BorderBezier;
-
-export const {
-  BorderBezier,
-  buildBorderBezierPath,
-  mountBorderBezier,
-  mountAllBorderBezier,
-  refreshAllBorderBezier
-} = api;
-
-export default api;
+export * from "./src/index.js";
+export { default } from "./src/index.js";

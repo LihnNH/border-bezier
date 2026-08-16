@@ -1,2 +1,12 @@
 # Local comparison and screenshot helper
 /comparison.html
+
+# Dependencies and local package archives
+node_modules/
+*.tgz
+
+# Logs and local environment files
+*.log
+.env
+.env.*
+!.env.example

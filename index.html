@@ -10,8 +10,15 @@
     <meta name="theme-color" content="#f4f3ef" />
     <title>border-bezier playground</title>
 
-    <link rel="stylesheet" href="./border-bezier.css" />
-    <script defer src="./border-bezier.js"></script>
+    <link
+      rel="stylesheet"
+      href="./src/styles.css"
+    />
+    <script type="module">
+      import BorderBezier from "./src/index.js";
+
+      window.BorderBezier = BorderBezier;
+    </script>
 
     <style>
       :root {

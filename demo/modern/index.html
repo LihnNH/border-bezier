@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Border Bézier — Modern ESM demo</title>
+    <link rel="stylesheet" href="../../src/styles.css" />
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        margin: 0;
+        background: #f4f3ef;
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+      }
+      .card {
+        width: min(420px, calc(100vw - 40px));
+        min-height: 220px;
+        display: grid;
+        place-items: center;
+        padding: 32px;
+        background: #171717;
+        color: #fff;
+        font-size: 20px;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">border-bezier modern</div>
+
+    <script type="module">
+      import { mountBorderBezier } from "../../src/index.js";
+
+      mountBorderBezier(document.querySelector(".card"), {
+        radius: "2rem",
+        smoothing: 0.9
+      });
+    </script>
+  </body>
+</html>

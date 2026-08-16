@@ -1,3 +1,8 @@
+/*
+ * border-bezier.css
+ * Declarative styles for border-bezier.js.
+ */
+
 @property --border-bezier {
   syntax: "<length-percentage>";
   inherits: false;
@@ -13,6 +18,9 @@
 :where(.border-bezier, [data-border-bezier]) {
   --border-bezier: 24px;
   --border-bezier-smoothing: 1;
+
+  overflow: hidden;
+  will-change: clip-path;
 }
 
 @media (prefers-reduced-motion: reduce) {
