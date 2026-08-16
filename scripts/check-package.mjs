@@ -24,12 +24,21 @@ for (const file of required) {
   await access(path.join(packageRoot, file));
 }
 
+const npmCli = process.env.npm_execpath;
+const npmCommand = npmCli
+  ? process.execPath
+  : process.platform === "win32" ? "npm.cmd" : "npm";
+const npmArguments = npmCli
+  ? [npmCli, "pack", "--dry-run", "--json"]
+  : ["pack", "--dry-run", "--json"];
+
 const output = execFileSync(
-  "npm",
-  ["pack", "--dry-run", "--json"],
+  npmCommand,
+  npmArguments,
   {
     cwd: packageRoot,
     encoding: "utf8",
+    shell: !npmCli && process.platform === "win32",
     env: {
       ...process.env,
       npm_config_cache: process.env.npm_config_cache
